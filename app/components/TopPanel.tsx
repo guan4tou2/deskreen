@@ -10,9 +10,6 @@ import { useTranslation } from 'react-i18next';
 import SettingsOverlay from './SettingsOverlay/SettingsOverlay';
 import ConnectedDevicesListDrawer from './ConnectedDevicesListDrawer';
 import { SettingsContext } from '../containers/SettingsProvider';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore fine import here
-import RedHeartTwemojiPNG from '../images/red_heart_2764_twemoji_120x120.png';
 
 const useStylesWithTheme = (isDarkTheme: boolean) =>
   makeStyles(() =>
@@ -78,50 +75,7 @@ export default function TopPanel(props: any) {
     setIsConnectedDevicesDrawerOpen(!isConnectedDevicesDrawerOpen);
   }, [isConnectedDevicesDrawerOpen]);
 
-  const donateTooltipContent = t(
-    'If you like Deskreen consider contributing financially Deskreen is open-source Your donations keep us motivated to make Deskreen even better'
-  );
   const deskreenButtonTooltip = t('Click to visit our website');
-
-  const renderDonateButton = useCallback(() => {
-    return (
-      <Tooltip content={donateTooltipContent} position={Position.BOTTOM}>
-        <Button
-          style={{
-            marginRight: '10px',
-            borderRadius: '100px',
-          }}
-          onClick={() => {
-            shell.openExternal(
-              'https://twitter.com/Ukraine/status/1497294840110977024'
-            );
-          }}
-        >
-          <Row start="xs">
-            <Col xs>
-              <img
-                src={RedHeartTwemojiPNG}
-                width={16}
-                height={16}
-                style={{ transform: 'translateY(2px)' }}
-                alt="heart"
-              />
-            </Col>
-            <Col xs>
-              <div
-                style={{
-                  transform: 'translateY(2px) translateX(-5px)',
-                  width: 'max-content',
-                }}
-              >
-                <Text>{t('Donate')}</Text>
-              </div>
-            </Col>
-          </Row>
-        </Button>
-      </Tooltip>
-    );
-  }, [donateTooltipContent, t]);
 
   const renderConnectedDevicesListButton = useCallback(() => {
     return (
@@ -221,12 +175,7 @@ export default function TopPanel(props: any) {
   return (
     <>
       <div className={getClassesCallback().topPanelRoot}>
-        <Row
-          middle="xs"
-          center="xs"
-          style={{ width: '100%', transform: 'translateX(-50px)' }}
-        >
-          <Col>{renderDonateButton()}</Col>
+        <Row middle="xs" center="xs" style={{ width: '100%' }}>
           <Col>{renderLogoWithAppName()}</Col>
         </Row>
         <div className={getClassesCallback().topPanelControlButtonsRoot}>

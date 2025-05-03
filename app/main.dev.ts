@@ -11,18 +11,20 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, globalShortcut, dialog } from 'electron';
 import store from './deskreen-electron-store';
 import i18n from './configs/i18next.config';
 import signalingServer from './server';
 import MenuBuilder from './menu';
 import initGlobals from './utils/mainProcessHelpers/initGlobals';
-import AppUpdater from './utils/AppUpdater';
-import installExtensions from './utils/installExtensions';
-import getNewVersionTag from './utils/getNewVersionTag';
 import initIpcMainHandlers from './main/ipcMainHandlers';
 import { ElectronStoreKeys } from './enums/ElectronStoreKeys.enum';
 import getDeskreenGlobal from './utils/mainProcessHelpers/getDeskreenGlobal';
+import fs from 'fs';
+import { config } from './api/config';
+import { version as appVersion } from '../package.json';
+import installExtensions from './utils/installExtensions';
+import Server from './server';
 
 export default class DeskreenApp {
   mainWindow: BrowserWindow | null = null;
@@ -51,35 +53,6 @@ export default class DeskreenApp {
     } else {
       app.on('ready', async () => {
         this.createWindow();
-
-        const { Notification } = require('electron');
-
-        const latestAppVersion = await getNewVersionTag();
-
-        const showNotification = () => {
-          const notification = {
-            title: i18n.t('Deskreen Update is Available!'),
-            body: `${i18n.t('Your current version is')} ${
-              getDeskreenGlobal().currentAppVersion
-            } | ${i18n.t(
-              'Click to download new updated version'
-            )} ${latestAppVersion}`,
-          };
-          const notificationInstance = new Notification(notification);
-          notificationInstance.show();
-          notificationInstance.on('click', (event) => {
-            event.preventDefault(); // prevent the browser from focusing the Notification's tab
-            shell.openExternal('https://deskreen.com');
-          });
-        };
-
-        if (
-          latestAppVersion !== '' &&
-          latestAppVersion !== getDeskreenGlobal().currentAppVersion
-        ) {
-          getDeskreenGlobal().latestAppVersion = latestAppVersion;
-          showNotification();
-        }
       });
     }
 
@@ -160,10 +133,6 @@ export default class DeskreenApp {
     this.menuBuilder.buildMenu();
 
     this.initI18n();
-
-    // Remove this if your app does not use auto updates
-    // eslint-disable-next-line
-    new AppUpdater();
 
     initIpcMainHandlers(this.mainWindow);
   }

@@ -289,8 +289,6 @@
  * MIT Licensed
  */
 
-/*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
-
 /**
  * @license
  * Lodash <https://lodash.com/>

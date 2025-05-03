@@ -22,7 +22,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import FullScreenEnter from '../../images/fullscreen_24px.svg';
 import FullScreenExit from '../../images/fullscreen_exit-24px.svg';
-import RedHeartTwemojiPNG from '../../images/red_heart_2764_twemoji_120x120.png';
 import { Col, Row } from 'react-flexbox-grid';
 import screenfull from 'screenfull';
 import { VideoQuality } from '../../features/VideoAutoQualityOptimizer/VideoQualityEnum';
@@ -30,8 +29,7 @@ import handlePlayerToggleFullscreen from './handlePlayerToggleFullscreen';
 import initScreenfullOnChange from './initScreenfullOnChange';
 import ScreenSharingSource from '../../features/PeerConnection/ScreenSharingSourceEnum';
 import { REACT_PLAYER_WRAPPER_ID } from '../../constants/appConstants';
-import './index.css'
-
+import './index.css';
 
 const videoQualityButtonStyle: React.CSSProperties = {
   width: '100%',
@@ -130,41 +128,6 @@ function PlayerControlPanel(props: PlayerControlPanelProps) {
                 </Row>
               </Button>
             </Tooltip>
-            <Tooltip
-              content={t(
-                'If you like Deskreen consider contributing financially Deskreen is open-source Your donations keep us motivated to make Deskreen even better'
-              )}
-              position={Position.BOTTOM}
-            >
-              <Button
-                style={{ borderRadius: '100px' }}
-                onClick={() => {
-                  window.open('https://twitter.com/Ukraine/status/1497294840110977024', '_blank');
-                }}
-              >
-                <Row start="xs">
-                  <Col xs>
-                    <img
-                      src={RedHeartTwemojiPNG}
-                      width={16}
-                      height={16}
-                      style={{ transform: 'translateY(2px)' }}
-                      alt="heart"
-                    />
-                  </Col>
-                  <Col xs>
-                    <div
-                      style={{
-                        transform: 'translateY(2px) translateX(-5px)',
-                        width: 'max-content',
-                      }}
-                    >
-                      <Text>{t('Donate')}</Text>
-                    </div>
-                  </Col>
-                </Row>
-              </Button>
-            </Tooltip>
           </Col>
           <Col xs={12} md={5}>
             <Row center="xs" style={{ height: '42px' }}>
@@ -205,7 +168,7 @@ function PlayerControlPanel(props: PlayerControlPanelProps) {
                         />
                       </Col>
                       <Col xs>
-                        { /* @ts-ignore */ }
+                        {/* @ts-ignore */}
                         <Text className="bp3-text-large play-pause-text">
                           {isPlaying ? t('Pause') : t('Play')}
                         </Text>

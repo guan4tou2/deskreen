@@ -330,4 +330,20 @@ export default function initIpcMainHandlers(mainWindow: BrowserWindow) {
     sharingSession?.destroy();
     getDeskreenGlobal().sharingSessionService.sharingSessions.delete(id);
   });
+
+  // 获取安全连接设置
+  ipcMain.handle(IpcEvents.GetIsSecureConnection, () => {
+    if (store.has(ElectronStoreKeys.IsSecureConnection)) {
+      return store.get(ElectronStoreKeys.IsSecureConnection);
+    }
+    return true; // 默认为安全连接
+  });
+
+  // 设置安全连接
+  ipcMain.handle(IpcEvents.SetIsSecureConnection, (_, isSecure) => {
+    if (store.has(ElectronStoreKeys.IsSecureConnection)) {
+      store.delete(ElectronStoreKeys.IsSecureConnection);
+    }
+    store.set(ElectronStoreKeys.IsSecureConnection, isSecure);
+  });
 }

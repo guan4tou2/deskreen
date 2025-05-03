@@ -6,8 +6,8 @@ import VideoDimensionsAreWrongError from './errors/VideoDimensionsAreWrongError'
 import VideoNotDefinedError from './errors/VideoNotDefinedError';
 import ImageDataIsUndefinedError from './errors/ImageDataIsUndefinedError';
 
-export const CANVAS_SCALE_MULTIPLIER = 0.125; // 1/8 of original canvas size, to speed up calculations
-export const MISMATCH_PERCENT_THRESHOLD = 0.1;
+export const CANVAS_SCALE_MULTIPLIER = 0.1; // 1/10 of original canvas size, to speed up calculations
+export const MISMATCH_PERCENT_THRESHOLD = 0.15;
 
 export default class VideoAutoQualityOptimizer {
   video: undefined | HTMLVideoElement;
@@ -43,7 +43,7 @@ export default class VideoAutoQualityOptimizer {
           console.error(e);
         }
       }
-    }, 1000);
+    }, 500); // 减少间隔时间以更快响应变化
   }
 
   doFrameComparisonAndQualityOptimization() {
@@ -62,7 +62,9 @@ export default class VideoAutoQualityOptimizer {
     }
 
     try {
-      const mismatchInPercent = this.getPreviousAndCurrentFrameMismatchInPercent(imageData);
+      const mismatchInPercent = this.getPreviousAndCurrentFrameMismatchInPercent(
+        imageData
+      );
       this.handleFramesMismatch(mismatchInPercent);
     } catch (e) {
       // usually frames size mismatch thrown here, so can be ignored as it happens
@@ -89,7 +91,7 @@ export default class VideoAutoQualityOptimizer {
     setTimeout(() => {
       this.findAndSetVideoInternalVariable(document);
       this.findAndSetCanvasInternalVariable(document);
-    }, 1000);
+    }, 500); // 减少等待时间以加快初始化
   }
 
   clearCanvas() {
@@ -123,11 +125,7 @@ export default class VideoAutoQualityOptimizer {
   }
 
   scaleCanvas() {
-    if (
-      !this.canvas ||
-      !this.video
-    )
-      return;
+    if (!this.canvas || !this.video) return;
     this.canvas.width = this.video.videoWidth * CANVAS_SCALE_MULTIPLIER;
     this.canvas.height = this.video.videoHeight * CANVAS_SCALE_MULTIPLIER;
   }
@@ -135,7 +133,7 @@ export default class VideoAutoQualityOptimizer {
   drawVideoFrameToCanvas() {
     if (!this.video) return;
     this.canvas
-      ?.getContext('2d')
+      ?.getContext('2d', { alpha: false })
       ?.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
   }
 
@@ -153,24 +151,37 @@ export default class VideoAutoQualityOptimizer {
       null,
       this.canvas.width,
       this.canvas.height,
-      { threshold: 0.1 }
+      { threshold: 0.15 } // 增加阈值减少误判
     );
   }
 
   getPreviousAndCurrentFrameMismatchInPercent(imageData: ImageData) {
     if (!this.canvas) return 0;
-    return this.getNumberOfMismatchedPixels(imageData) / (this.canvas.width * this.canvas.height);
+    return (
+      this.getNumberOfMismatchedPixels(imageData) /
+      (this.canvas.width * this.canvas.height)
+    );
   }
 
   handleFramesMismatch(mismatchInPercent: number) {
-    if (mismatchInPercent < 0.1 && this.largeMismatchFramesCount > 0) {
+    if (
+      mismatchInPercent < MISMATCH_PERCENT_THRESHOLD &&
+      this.largeMismatchFramesCount > 0
+    ) {
       this.largeMismatchFramesCount -= 1;
-    } else if (mismatchInPercent < 0.1 && this.isRequestedHalfQuality) {
+    } else if (
+      mismatchInPercent < MISMATCH_PERCENT_THRESHOLD &&
+      this.isRequestedHalfQuality
+    ) {
       this.largeMismatchFramesCount = 0;
       this.isRequestedHalfQuality = false;
       this.goodQualityCallback();
-    } else if (mismatchInPercent >= 0.1 && !this.isRequestedHalfQuality) {
-      if (this.largeMismatchFramesCount < 3) {
+    } else if (
+      mismatchInPercent >= MISMATCH_PERCENT_THRESHOLD &&
+      !this.isRequestedHalfQuality
+    ) {
+      if (this.largeMismatchFramesCount < 2) {
+        // 减少到2次以更快响应
         this.largeMismatchFramesCount += 1;
       } else {
         this.halfQualityCallbak();
@@ -178,7 +189,6 @@ export default class VideoAutoQualityOptimizer {
       }
     }
   }
-
 
   isLowMismatchPercent(mismatchInPercent: number) {
     return mismatchInPercent < MISMATCH_PERCENT_THRESHOLD;
