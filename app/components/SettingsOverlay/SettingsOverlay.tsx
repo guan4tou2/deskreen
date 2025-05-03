@@ -62,7 +62,11 @@ export default function SettingsOverlay(props: SettingsOverlayProps) {
   const [latestVersion, setLatestVersion] = useState('');
   const [currentVersion, setCurrentVersion] = useState('');
 
-  const { isDarkTheme } = useContext(SettingsContext);
+  const {
+    isDarkTheme,
+    isSecureConnection,
+    setIsSecureConnectionHook,
+  } = useContext(SettingsContext);
 
   useEffect(() => {
     const getLatestVersion = async () => {
@@ -108,27 +112,28 @@ export default function SettingsOverlay(props: SettingsOverlayProps) {
         label={t('Language')}
         input={<LanguageSelector />}
       />
-      <SettingRowLabelAndInput
-        icon="automatic-updates"
-        label={t('Automatic Updates')}
-        input={getAutomaticUpdatesCheckboxInput()}
-      />
     </>
   );
 
   const SecurityPanel: React.FC = () => (
     <div>
-      <H3>
-        <Icon icon="shield" iconSize={20} />
-        {t('Security Settings')}
-      </H3>
-      <H6 className={Classes.RUNNING_TEXT}>
-        {`HTML is great for declaring static documents, but it falters when we try
-        to use it for declaring dynamic views in web-applications. AngularJS
-        lets you extend HTML vocabulary for your application. The resulting
-        environment is extraordinarily expressive, readable, and quick to
-        develop.`}
-      </H6>
+      <Row middle="xs">
+        <H3 className="bp3-text-muted">{t('Security Settings')}</H3>
+      </Row>
+      <SettingRowLabelAndInput
+        icon="shield"
+        label={t('Secure Connection')}
+        input={<SecureConnectionToggle />}
+      />
+      <Row>
+        <Col xs={12}>
+          <H6 className={Classes.RUNNING_TEXT}>
+            {t(
+              'Secure connection ensures that all data transmitted between your computer and connected devices is encrypted. This feature is recommended for protecting your privacy.'
+            )}
+          </H6>
+        </Col>
+      </Row>
     </div>
   );
 
@@ -225,6 +230,16 @@ export default function SettingsOverlay(props: SettingsOverlayProps) {
         />
         <Text className="bp3-text-large">{t('About')}</Text>
       </Row>
+    );
+  };
+
+  const SecureConnectionToggle: React.FC = () => {
+    return (
+      <Checkbox
+        checked={isSecureConnection}
+        onChange={(e) => setIsSecureConnectionHook(e.target.checked)}
+        label={isSecureConnection ? t('Enabled') : t('Disabled')}
+      />
     );
   };
 

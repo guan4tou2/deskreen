@@ -27,4 +27,6 @@ export enum IpcEvents {
   GetIsAppDarkTheme = 'get-is-app-dark-theme',
   SetIsAppDarkTheme = 'set-is-app-dark-theme',
   DestroySharingSessionById = 'destroy-sharing-session-by-id',
+  GetIsSecureConnection = 'get-is-secure-connection',
+  SetIsSecureConnection = 'set-is-secure-connection',
 }

@@ -19,7 +19,15 @@ export default function handleCreatePeer(peerConnection: PeerConnection) {
         if (peerConnection.peer === NullSimplePeer) {
           peerConnection.peer = new SimplePeer({
             initiator: true,
-            config: { iceServers: [] },
+            config: {
+              iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+              ],
+              iceTransportPolicy: 'all', // 允许所有类型的ICE候选者
+            },
+            trickle: true, // 启用trickle ICE以加速连接建立
             sdpTransform: simplePeerHandleSdpTransform,
           });
         }

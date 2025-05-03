@@ -11,8 +11,10 @@ export const DARK_UI_BACKGROUND = '#293742';
 interface SettingsContextInterface {
   isDarkTheme: boolean;
   currentLanguage: string;
+  isSecureConnection: boolean;
   setIsDarkThemeHook: (val: boolean) => void;
   setCurrentLanguageHook: (newLang: string) => void;
+  setIsSecureConnectionHook: (isSecure: boolean) => void;
 }
 
 const defaultSettingsContextValue = {
@@ -20,6 +22,8 @@ const defaultSettingsContextValue = {
   setIsDarkThemeHook: () => {},
   setCurrentLanguageHook: () => {},
   currentLanguage: 'en',
+  isSecureConnection: true,
+  setIsSecureConnectionHook: () => {},
 };
 
 export const SettingsContext = React.createContext<SettingsContextInterface>(
@@ -29,6 +33,7 @@ export const SettingsContext = React.createContext<SettingsContextInterface>(
 export const SettingsProvider: React.FC = ({ children }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [isSecureConnection, setIsSecureConnection] = useState(true);
 
   const loadDarkThemeFromSettings = async () => {
     const isDarkAppTheme = await ipcRenderer.invoke(
@@ -43,8 +48,14 @@ export const SettingsProvider: React.FC = ({ children }) => {
     setIsDarkTheme(isDarkAppTheme);
   };
 
+  const loadSecureConnectionFromSettings = async () => {
+    const isSecure = await ipcRenderer.invoke(IpcEvents.GetIsSecureConnection);
+    setIsSecureConnection(isSecure !== false);
+  };
+
   useEffect(() => {
     loadDarkThemeFromSettings();
+    loadSecureConnectionFromSettings();
   }, []);
 
   const setIsDarkThemeHook = (isAppDarkTheme: boolean) => {
@@ -56,11 +67,18 @@ export const SettingsProvider: React.FC = ({ children }) => {
     setCurrentLanguage(newLang);
   };
 
+  const setIsSecureConnectionHook = (isSecure: boolean) => {
+    ipcRenderer.invoke(IpcEvents.SetIsSecureConnection, isSecure);
+    setIsSecureConnection(isSecure);
+  };
+
   const value = {
     isDarkTheme,
     setIsDarkThemeHook,
     currentLanguage,
     setCurrentLanguageHook,
+    isSecureConnection,
+    setIsSecureConnectionHook,
   };
 
   return (

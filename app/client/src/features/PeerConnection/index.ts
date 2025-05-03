@@ -115,13 +115,23 @@ export default class PeerConnection {
 
     const peer = new SimplePeer({
       initiator: false,
-      config: { iceServers: [] },
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+        ],
+        iceTransportPolicy: 'all', // 允许所有类型的ICE候选者
+      },
+      // 优化WebRTC性能
+      trickle: true, // 启用trickle ICE以加速连接建立
       sdpTransform: (sdp) => {
         let newSDP = sdp;
+        // 设置更高的视频比特率
         newSDP = (setSdpMediaBitrate(
           (newSDP as unknown) as string,
           'video',
-          500000
+          2000000
         ) as unknown) as typeof sdp;
         return newSDP;
       },
